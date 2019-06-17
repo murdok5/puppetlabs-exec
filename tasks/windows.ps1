@@ -31,19 +31,23 @@ function write_error($Message, $ExitCode){
 
 $ExitCode=0
 if ($Interleave -eq $true){
-    $Redirect = "2>&1"
 }
 
-$CommandOutput = $Command $Redirect
-if ($LASTEXITCODE -eq 0){
-    echo $CommandOutput
-}
-else {
-    if (($FailOnFail -eq $true) -and ( $LASTEXITCODE -ne 0 )){
-        $ExitCode=255
-    }
-
+try {
+  $commandOutput = switch ($true) {
+    $interleave { Invoke-Expression -Command $command 2>&1 }
+    Default { Invoke-Expression -Command $command }
+  }
+  if ($LASTEXITCODE -eq 0){
+    Write-Host $CommandOutput
+  }
+  else {
     write_error -Message $CommandOutput -ExitCode $ExitCode
+  }
+}
+catch {
+  write_error -Message $_.exception.message
+  $ExitCode=-1
 }
 
 exit $ExitCode
