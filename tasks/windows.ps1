@@ -34,7 +34,7 @@ if ($Interleave -eq $true){
     $Redirect = "2>&1"
 }
 
-$CommandOutput = cmd /c $Command $Redirect
+$CommandOutput = $Command $Redirect
 if ($LASTEXITCODE -eq 0){
     echo $CommandOutput
 }
